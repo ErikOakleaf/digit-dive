@@ -1,3 +1,9 @@
 BasedOnStyle: LLVM
 IndentWidth: 4
 UseTab: Never
+PenaltyBreakAssignment: 1000
+BinPackArguments: true
+BinPackParameters: true
+AllowAllArgumentsOnNextLine: false
+PenaltyBreakBeforeFirstCallParameter: 1000
+ColumnLimit: 120

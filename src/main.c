@@ -1,37 +1,58 @@
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_log.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_video.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
 
-    SDL_Window *window; // Declare a pointer
+    SDL_Window *window;
     bool done = false;
 
-    SDL_Init(SDL_INIT_VIDEO); // Initialize SDL3
+    SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
 
-    // Create an application window with the following settings:
-    window = SDL_CreateWindow("An SDL3 window", // window title
-                              640,              // width, in pixels
-                              480,              // height, in pixels
-                              SDL_WINDOW_OPENGL // flags - see below
-    );
+    // Create an application
+    window = SDL_CreateWindow("digit dive", 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
-    // Check that the window was successfully created
     if (window == NULL) {
-        // In the case that the window could not be made...
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n",
-                     SDL_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
         return 1;
     }
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
     if (!renderer) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create renderer: %s\n",
-                     SDL_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create renderer: %s\n", SDL_GetError());
         return 1;
     }
 
-    printf("something here");
+    TTF_Font *font = TTF_OpenFont("assets/IBMPlexMono-Medium.ttf", 24);
+    if (!font) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not load font: %s", SDL_GetError());
+        return 1;
+    }
+
+    SDL_Color textColor = {0, 0, 0, 255};
+
+    SDL_Surface *textSurface = TTF_RenderText_Blended(font, "Hello, World", 0, textColor);
+    if (!textSurface) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not render texture: %s", SDL_GetError());
+    }
+
+    int textW = textSurface->w;
+    int textH = textSurface->h;
+
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    if (!textTexture) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create texture: %s", SDL_GetError());
+        return 1;
+    }
+    SDL_DestroySurface(textSurface);
+
+    SDL_FRect textRect = {50.0f, 50.0f, (float)textW, (float)textH};
 
     while (!done) {
         SDL_Event event;
@@ -40,19 +61,20 @@ int main(int argc, char *argv[]) {
                 done = true;
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 245, 255, 250, 255);
         SDL_RenderClear(renderer);
 
-        // Present the frame
+        SDL_RenderTexture(renderer, textTexture, NULL, &textRect);
+
         SDL_RenderPresent(renderer);
 
-        SDL_Delay(16); // ~60 FPS
+        SDL_Delay(16);
     }
 
-    // Close and destroy the window
+    TTF_CloseFont(font);
     SDL_DestroyWindow(window);
-
-    // Clean up
+    SDL_DestroyRenderer(renderer);
+    TTF_Quit();
     SDL_Quit();
     return 0;
 }
