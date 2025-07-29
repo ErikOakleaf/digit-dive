@@ -7,3 +7,4 @@ BinPackParameters: true
 AllowAllArgumentsOnNextLine: false
 PenaltyBreakBeforeFirstCallParameter: 1000
 ColumnLimit: 120
+IndentCaseLabels: true

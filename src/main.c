@@ -8,6 +8,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Structs
 
@@ -102,19 +103,20 @@ void drawPrefixes(SDLContext *ctx, SDL_Color textColor) {
     renderTextLine(ctx->font, ctx->renderer, "Hex    :", 50.0, 150.0, textColor);
 }
 
-void drawDigits(SDLContext *ctx, SDL_Color textColor, char *buffer) {
+void drawDigits(SDLContext *ctx, SDL_Color textColor, StringBuffers *buffers) {
     SDL_SetRenderDrawColor(ctx->renderer, 245, 255, 250, 255);
     SDL_RenderClear(ctx->renderer);
 
     drawPrefixes(ctx, textColor);
-    renderTextLine(ctx->font, ctx->renderer, buffer, 180.0, 50.0, textColor);
+    renderTextLine(ctx->font, ctx->renderer, buffers->decimalBuffer, 180.0, 50.0, textColor);
+    renderTextLine(ctx->font, ctx->renderer, buffers->binaryBuffer, 180.0, 100.0, textColor);
 
     SDL_RenderPresent(ctx->renderer);
 }
 
 // String functions
 
-void reverse(char *str) {
+void reverseString(char *str) {
     if (!str) {
         return;
     }
@@ -140,32 +142,74 @@ void decimalToBinary(char *decimalBuffer, char *binaryBuffer) {
     int i = 0;
     while (decimal > 0) {
         int bit = decimal & 1;
-        binaryBuffer[i] = '0' + bit;
+        binaryBuffer[i++] = '0' + bit;
 
         decimal = decimal >> 1;
     }
 
     binaryBuffer[i] = '\0';
+
+    reverseString(binaryBuffer);
 }
 
-void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c) {
-    if (*bufferIndex < 11) {
+void addToBufferDecimal(StringBuffers *buffers, int *bufferIndex, char c) {
+    if (*bufferIndex < 10) {
         buffers->decimalBuffer[(*bufferIndex)++] = c;
         buffers->decimalBuffer[*bufferIndex] = '\0';
     }
+
+    decimalToBinary(buffers->decimalBuffer, buffers->binaryBuffer);
 }
 
-void addToBufferDecimal(char *buffer, int *bufferIndex, char c) {
-    if (*bufferIndex < 11) {
-        buffer[(*bufferIndex)++] = c;
-        buffer[*bufferIndex] = '\0';
+void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c, BufferType type) {
+    switch (type) {
+        case Decimal: {
+            if (!(c >= '0' && c <= '9')) {
+                return;
+            }
+            addToBufferDecimal(buffers, bufferIndex, c);
+            break;
+        }
+        case Binary: {
+
+            break;
+        }
+        case Hex: {
+
+            break;
+        }
+        default:
+            return;
     }
 }
 
-void removeFromBuffer(char *buffer, int *bufferIndex) {
-    if (!(*bufferIndex < 0)) {
-        (*bufferIndex)--;
-        buffer[*bufferIndex] = '\0';
+void removeFromBufferDecimal(StringBuffers *buffers, int *bufferIndex) {
+    (*bufferIndex)--;
+    buffers->decimalBuffer[*bufferIndex] = '\0';
+
+    decimalToBinary(buffers->decimalBuffer, buffers->binaryBuffer);
+}
+
+void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type) {
+    if (*bufferIndex < 0) {
+        return;
+    }
+
+    switch (type) {
+        case Decimal: {
+            removeFromBufferDecimal(buffers, bufferIndex);
+            break;
+        }
+        case Binary: {
+
+            break;
+        }
+        case Hex: {
+
+            break;
+        }
+        default:
+            return;
     }
 }
 
@@ -204,47 +248,47 @@ int main(int argc, char *argv[]) {
                     run = false;
                 }
                 if (event.key.key == SDLK_BACKSPACE) {
-                    removeFromBuffer(&buffers, &cursor);
+                    removeFromBuffer(&buffers, &cursor, Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_0) {
-                    addToBuffer(&buffers, &cursor, '0');
+                    addToBuffer(&buffers, &cursor, '0', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_1) {
-                    addToBuffer(&buffers, &cursor, '1');
+                    addToBuffer(&buffers, &cursor, '1', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_2) {
-                    addToBuffer(&buffers, &cursor, '2');
+                    addToBuffer(&buffers, &cursor, '2', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_3) {
-                    addToBuffer(&buffers, &cursor, '3');
+                    addToBuffer(&buffers, &cursor, '3', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_4) {
-                    addToBuffer(&buffers, &cursor, '4');
+                    addToBuffer(&buffers, &cursor, '4', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_5) {
-                    addToBuffer(&buffers, &cursor, '5');
+                    addToBuffer(&buffers, &cursor, '5', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_6) {
-                    addToBuffer(&buffers, &cursor, '6');
+                    addToBuffer(&buffers, &cursor, '6', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_7) {
-                    addToBuffer(&buffers, &cursor, '7');
+                    addToBuffer(&buffers, &cursor, '7', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_8) {
-                    addToBuffer(&buffers, &cursor, '8');
+                    addToBuffer(&buffers, &cursor, '8', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_9) {
-                    addToBuffer(&buffers, &cursor, '9');
+                    addToBuffer(&buffers, &cursor, '9', Decimal);
                     drawDigits(&ctx, textColor, &buffers);
                 }
             }
