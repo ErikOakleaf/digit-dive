@@ -1,4 +1,5 @@
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL_rect.h>
@@ -6,12 +7,31 @@
 #include <SDL3/SDL_video.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+// Structs
 
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
     TTF_Font *font;
 } SDLContext;
+
+typedef struct {
+    char decimalBuffer[11];
+    char binaryBuffer[33];
+    char hexBuffer[9];
+} StringBuffers;
+
+// Enums
+
+typedef enum {
+    Decimal,
+    Binary,
+    Hex,
+} BufferType;
+
+// SDL Functions
 
 SDLContext initSDL() {
     SDLContext ctx = {NULL};
@@ -26,7 +46,7 @@ SDLContext initSDL() {
         return ctx;
     }
 
-    ctx.window = SDL_CreateWindow("digit dive", 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    ctx.window = SDL_CreateWindow("digit dive", 640, 250, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (!ctx.window) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
@@ -49,6 +69,10 @@ SDLContext initSDL() {
 }
 
 int renderTextLine(TTF_Font *font, SDL_Renderer *renderer, const char *text, float x, float y, SDL_Color textColor) {
+    if (strlen(text) == 0) {
+        return 0;
+    }
+
     SDL_Surface *textSurface = TTF_RenderText_Blended(font, text, 0, textColor);
     if (!textSurface) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not render texture: %s", SDL_GetError());
@@ -72,8 +96,88 @@ int renderTextLine(TTF_Font *font, SDL_Renderer *renderer, const char *text, flo
     return 0;
 };
 
+void drawPrefixes(SDLContext *ctx, SDL_Color textColor) {
+    renderTextLine(ctx->font, ctx->renderer, "Decimal:", 50.0, 50.0, textColor);
+    renderTextLine(ctx->font, ctx->renderer, "Binary :", 50.0, 100.0, textColor);
+    renderTextLine(ctx->font, ctx->renderer, "Hex    :", 50.0, 150.0, textColor);
+}
+
+void drawDigits(SDLContext *ctx, SDL_Color textColor, char *buffer) {
+    SDL_SetRenderDrawColor(ctx->renderer, 245, 255, 250, 255);
+    SDL_RenderClear(ctx->renderer);
+
+    drawPrefixes(ctx, textColor);
+    renderTextLine(ctx->font, ctx->renderer, buffer, 180.0, 50.0, textColor);
+
+    SDL_RenderPresent(ctx->renderer);
+}
+
+// String functions
+
+void reverse(char *str) {
+    if (!str) {
+        return;
+    }
+
+    char *start = str;
+    char *end = str;
+
+    while (*end != '\0') {
+        end++;
+    }
+    end--;
+
+    while (start < end) {
+        char tmp = *start;
+        *start++ = *end;
+        *end-- = tmp;
+    }
+}
+
+void decimalToBinary(char *decimalBuffer, char *binaryBuffer) {
+    int decimal = atoi(decimalBuffer);
+
+    int i = 0;
+    while (decimal > 0) {
+        int bit = decimal & 1;
+        binaryBuffer[i] = '0' + bit;
+
+        decimal = decimal >> 1;
+    }
+
+    binaryBuffer[i] = '\0';
+}
+
+void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c) {
+    if (*bufferIndex < 11) {
+        buffers->decimalBuffer[(*bufferIndex)++] = c;
+        buffers->decimalBuffer[*bufferIndex] = '\0';
+    }
+}
+
+void addToBufferDecimal(char *buffer, int *bufferIndex, char c) {
+    if (*bufferIndex < 11) {
+        buffer[(*bufferIndex)++] = c;
+        buffer[*bufferIndex] = '\0';
+    }
+}
+
+void removeFromBuffer(char *buffer, int *bufferIndex) {
+    if (!(*bufferIndex < 0)) {
+        (*bufferIndex)--;
+        buffer[*bufferIndex] = '\0';
+    }
+}
+
 int main(int argc, char *argv[]) {
     bool run = true;
+
+    StringBuffers buffers;
+    memset(buffers.decimalBuffer, 0, sizeof(buffers.decimalBuffer));
+    memset(buffers.binaryBuffer, 0, sizeof(buffers.binaryBuffer));
+    memset(buffers.hexBuffer, 0, sizeof(buffers.hexBuffer));
+
+    int cursor = 0;
 
     SDLContext ctx = initSDL();
     if (!ctx.window || !ctx.renderer || !ctx.font) {
@@ -84,7 +188,9 @@ int main(int argc, char *argv[]) {
 
     SDL_SetRenderDrawColor(ctx.renderer, 245, 255, 250, 255);
     SDL_RenderClear(ctx.renderer);
-    renderTextLine(ctx.font, ctx.renderer, "hello world", 50.0, 50.0, textColor);
+
+    drawPrefixes(&ctx, textColor);
+
     SDL_RenderPresent(ctx.renderer);
 
     while (run) {
@@ -92,6 +198,56 @@ int main(int argc, char *argv[]) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT)
                 run = false;
+
+            else if (event.type == SDL_EVENT_KEY_DOWN) {
+                if (event.key.key == SDLK_ESCAPE) {
+                    run = false;
+                }
+                if (event.key.key == SDLK_BACKSPACE) {
+                    removeFromBuffer(&buffers, &cursor);
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_0) {
+                    addToBuffer(&buffers, &cursor, '0');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_1) {
+                    addToBuffer(&buffers, &cursor, '1');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_2) {
+                    addToBuffer(&buffers, &cursor, '2');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_3) {
+                    addToBuffer(&buffers, &cursor, '3');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_4) {
+                    addToBuffer(&buffers, &cursor, '4');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_5) {
+                    addToBuffer(&buffers, &cursor, '5');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_6) {
+                    addToBuffer(&buffers, &cursor, '6');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_7) {
+                    addToBuffer(&buffers, &cursor, '7');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_8) {
+                    addToBuffer(&buffers, &cursor, '8');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_9) {
+                    addToBuffer(&buffers, &cursor, '9');
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+            }
         }
 
         SDL_Delay(16);
