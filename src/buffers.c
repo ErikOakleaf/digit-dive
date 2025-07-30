@@ -64,7 +64,10 @@ void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c, BufferType ty
             break;
         }
         case Binary: {
-
+            if (!(c == '0' | c == '1')) {
+                return;
+            }
+            addToBufferBinary(buffers, bufferIndex, c);
             break;
         }
         case Hex: {
@@ -86,6 +89,15 @@ void addToBufferDecimal(StringBuffers *buffers, int *bufferIndex, char c) {
     decimalToHex(buffers->decimalBuffer, buffers->hexBuffer);
 }
 
+void addToBufferBinary(StringBuffers *buffers, int *bufferIndex, char c) {
+    if (*bufferIndex < 33) {
+        buffers->binaryBuffer[(*bufferIndex)++] = c;
+        buffers->binaryBuffer[*bufferIndex] = '\0';
+    }
+
+    // TODO - Conversion
+}
+
 void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type) {
     if (*bufferIndex <= 0) {
         return;
@@ -97,7 +109,7 @@ void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type)
             break;
         }
         case Binary: {
-
+            removeFromBufferBinary(buffers, bufferIndex);
             break;
         }
         case Hex: {
@@ -115,6 +127,13 @@ void removeFromBufferDecimal(StringBuffers *buffers, int *bufferIndex) {
 
     decimalToBinary(buffers->decimalBuffer, buffers->binaryBuffer);
     decimalToHex(buffers->decimalBuffer, buffers->hexBuffer);
+}
+
+void removeFromBufferBinary(StringBuffers *buffers, int *bufferIndex) {
+    (*bufferIndex)--;
+    buffers->binaryBuffer[*bufferIndex] = '\0';
+
+    // TODO - conversion
 }
 
 void resetBuffers(StringBuffers *buffers, int *cursor) {

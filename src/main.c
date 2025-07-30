@@ -1,6 +1,6 @@
-#include "sdl_context.h"
 #include "buffers.h"
 #include "render.h"
+#include "sdl_context.h"
 
 #include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_main.h>
@@ -31,11 +31,10 @@ int main(int argc, char *argv[]) {
 
     while (run) {
         SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT)
+        if (SDL_WaitEvent(&event)) {
+            if (event.type == SDL_EVENT_QUIT) {
                 run = false;
-
-            else if (event.type == SDL_EVENT_KEY_DOWN) {
+            } else if (event.type == SDL_EVENT_KEY_DOWN) {
                 if (event.key.key == SDLK_ESCAPE) {
                     run = false;
                 }
@@ -125,8 +124,6 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-
-        SDL_Delay(16);
     }
 
     cleanupSDL(&ctx);
