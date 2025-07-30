@@ -47,7 +47,7 @@ SDLContext initSDL() {
         return ctx;
     }
 
-    ctx.window = SDL_CreateWindow("digit dive", 800, 250, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    ctx.window = SDL_CreateWindow("digit dive", 640, 250, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (!ctx.window) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
@@ -110,6 +110,7 @@ void drawDigits(SDLContext *ctx, SDL_Color textColor, StringBuffers *buffers) {
     drawPrefixes(ctx, textColor);
     renderTextLine(ctx->font, ctx->renderer, buffers->decimalBuffer, 180.0, 50.0, textColor);
     renderTextLine(ctx->font, ctx->renderer, buffers->binaryBuffer, 180.0, 100.0, textColor);
+    renderTextLine(ctx->font, ctx->renderer, buffers->hexBuffer, 180.0, 150.0, textColor);
 
     SDL_RenderPresent(ctx->renderer);
 }
@@ -158,6 +159,11 @@ void decimalToBinary(char *decimalBuffer, char *binaryBuffer) {
     reverseString(binaryBuffer);
 }
 
+void decimalToHex(char *decimalBuffer, char *hexBuffer) {
+    long long decimal = atoll(decimalBuffer);
+    sprintf(hexBuffer, "%llX", decimal);
+}
+
 void addToBufferDecimal(StringBuffers *buffers, int *bufferIndex, char c) {
     if (*bufferIndex < 10) {
         buffers->decimalBuffer[(*bufferIndex)++] = c;
@@ -165,6 +171,7 @@ void addToBufferDecimal(StringBuffers *buffers, int *bufferIndex, char c) {
     }
 
     decimalToBinary(buffers->decimalBuffer, buffers->binaryBuffer);
+    decimalToHex(buffers->decimalBuffer, buffers->hexBuffer);
 }
 
 void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c, BufferType type) {
@@ -194,6 +201,7 @@ void removeFromBufferDecimal(StringBuffers *buffers, int *bufferIndex) {
     buffers->decimalBuffer[*bufferIndex] = '\0';
 
     decimalToBinary(buffers->decimalBuffer, buffers->binaryBuffer);
+    decimalToHex(buffers->decimalBuffer, buffers->hexBuffer);
 }
 
 void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type) {
