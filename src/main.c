@@ -20,7 +20,7 @@ typedef struct {
 
 typedef struct {
     char decimalBuffer[11];
-    char binaryBuffer[33];
+    char binaryBuffer[35];
     char hexBuffer[9];
 } StringBuffers;
 
@@ -47,7 +47,7 @@ SDLContext initSDL() {
         return ctx;
     }
 
-    ctx.window = SDL_CreateWindow("digit dive", 640, 250, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    ctx.window = SDL_CreateWindow("digit dive", 680, 250, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (!ctx.window) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
@@ -227,6 +227,13 @@ void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type)
     }
 }
 
+void resetBuffers(StringBuffers *buffers, int *cursor) {
+    buffers->decimalBuffer[0] = '\0';
+    buffers->binaryBuffer[0] = '\0';
+    buffers->hexBuffer[0] = '\0';
+    *cursor = 0;
+}
+
 int main(int argc, char *argv[]) {
     bool run = true;
 
@@ -263,6 +270,10 @@ int main(int argc, char *argv[]) {
                 }
                 if (event.key.key == SDLK_BACKSPACE) {
                     removeFromBuffer(&buffers, &cursor, Decimal);
+                    drawDigits(&ctx, textColor, &buffers);
+                }
+                if (event.key.key == SDLK_RETURN) {
+                    resetBuffers(&buffers, &cursor);
                     drawDigits(&ctx, textColor, &buffers);
                 }
                 if (event.key.key == SDLK_0) {
