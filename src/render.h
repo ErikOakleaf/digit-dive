@@ -6,7 +6,7 @@
 #define RENDER_H
 
 int renderTextLine(TTF_Font *font, SDL_Renderer *renderer, const char *text, float x, float y, SDL_Color textColor); 
-void drawPrefixes(SDLContext *ctx, SDL_Color textColor); 
-void drawDigits(SDLContext *ctx, SDL_Color textColor, StringBuffers *buffers); 
+void drawPrefixes(SDLContext *ctx, SDL_Color textColor, BufferType type); 
+void drawDigits(SDLContext *ctx, SDL_Color textColor, StringBuffers *buffers, BufferType type); 
 
 #endif

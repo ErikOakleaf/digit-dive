@@ -1,5 +1,12 @@
 #include "buffers.h"
 
+void initBuffers(StringBuffers *buffers) {
+
+    memset(buffers->decimalBuffer, 0, sizeof(buffers->decimalBuffer));
+    memset(buffers->binaryBuffer, 0, sizeof(buffers->binaryBuffer));
+    memset(buffers->hexBuffer, 0, sizeof(buffers->hexBuffer));
+}
+
 void reverseString(char *str) {
     if (!str) {
         return;

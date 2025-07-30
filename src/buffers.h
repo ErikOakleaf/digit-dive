@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef struct {
     char decimalBuffer[11];
@@ -16,6 +17,7 @@ typedef enum {
     Hex,
 } BufferType;
 
+void initBuffers(StringBuffers *buffers);
 void reverseString(char *str);
 void decimalToBinary(char *decimalBuffer, char *binaryBuffer); 
 void decimalToHex(char *decimalBuffer, char *hexBuffer); 
