@@ -4,7 +4,7 @@ LDFLAGS = $(shell pkg-config --libs sdl3) $(shell pkg-config --libs sdl3-ttf)
 defualt: compile
 
 compile: 
-	gcc $(CFLAGS) -o main src/main.c $(LDFLAGS)
+	gcc $(CFLAGS) -o main src/main.c src/sdl_context.c src/buffers.c src/render.c $(LDFLAGS)
 
 run: compile
 	./main
