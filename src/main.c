@@ -47,7 +47,7 @@ SDLContext initSDL() {
         return ctx;
     }
 
-    ctx.window = SDL_CreateWindow("digit dive", 640, 250, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    ctx.window = SDL_CreateWindow("digit dive", 800, 250, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (!ctx.window) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
@@ -137,7 +137,13 @@ void reverseString(char *str) {
 }
 
 void decimalToBinary(char *decimalBuffer, char *binaryBuffer) {
-    int decimal = atoi(decimalBuffer);
+    long long decimal = atoll(decimalBuffer);
+
+    if (decimal == 0) {
+        binaryBuffer[0] = '0';
+        binaryBuffer[1] = '\0';
+        return;
+    }
 
     int i = 0;
     while (decimal > 0) {
@@ -191,7 +197,7 @@ void removeFromBufferDecimal(StringBuffers *buffers, int *bufferIndex) {
 }
 
 void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type) {
-    if (*bufferIndex < 0) {
+    if (*bufferIndex <= 0) {
         return;
     }
 
