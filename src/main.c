@@ -36,6 +36,18 @@ int main(int argc, char *argv[]) {
                 if (event.key.key == SDLK_ESCAPE) {
                     run = false;
                 }
+                if (event.key.key == SDLK_D && (SDL_GetModState() & SDL_KMOD_SHIFT)) {
+                    currentBufferType = Decimal;
+                    drawDigits(&ctx, textColor, &buffers, currentBufferType);
+                }
+                if (event.key.key == SDLK_B && (SDL_GetModState() & SDL_KMOD_SHIFT)) {
+                    currentBufferType = Binary;
+                    drawDigits(&ctx, textColor, &buffers, currentBufferType);
+                }
+                if (event.key.key == SDLK_H && (SDL_GetModState() & SDL_KMOD_SHIFT)) {
+                    currentBufferType = Hex;
+                    drawDigits(&ctx, textColor, &buffers, currentBufferType);
+                }
                 if (event.key.key == SDLK_BACKSPACE) {
                     removeFromBuffer(&buffers, currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
@@ -106,18 +118,6 @@ int main(int argc, char *argv[]) {
                 }
                 if (event.key.key == SDLK_F) {
                     addToBuffer(&buffers, 'F', currentBufferType);
-                    drawDigits(&ctx, textColor, &buffers, currentBufferType);
-                }
-                if (event.key.key == SDLK_D && (SDL_GetModState() & SDL_KMOD_SHIFT)) {
-                    currentBufferType = Decimal;
-                    drawDigits(&ctx, textColor, &buffers, currentBufferType);
-                }
-                if (event.key.key == SDLK_B && (SDL_GetModState() & SDL_KMOD_SHIFT)) {
-                    currentBufferType = Binary;
-                    drawDigits(&ctx, textColor, &buffers, currentBufferType);
-                }
-                if (event.key.key == SDLK_H && (SDL_GetModState() & SDL_KMOD_SHIFT)) {
-                    currentBufferType = Hex;
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
             }
