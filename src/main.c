@@ -13,8 +13,6 @@ int main(int argc, char *argv[]) {
 
     BufferType currentBufferType = Decimal;
 
-    int cursor = 0;
-
     SDLContext ctx = initSDL();
     if (!ctx.window || !ctx.renderer || !ctx.font) {
         return 1;
@@ -39,82 +37,82 @@ int main(int argc, char *argv[]) {
                     run = false;
                 }
                 if (event.key.key == SDLK_BACKSPACE) {
-                    removeFromBuffer(&buffers, &cursor, currentBufferType);
+                    removeFromBuffer(&buffers, currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_RETURN) {
-                    resetBuffers(&buffers, &cursor);
+                    resetBuffers(&buffers);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_0) {
-                    addToBuffer(&buffers, &cursor, '0', currentBufferType);
+                    addToBuffer(&buffers, '0', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_1) {
-                    addToBuffer(&buffers, &cursor, '1', currentBufferType);
+                    addToBuffer(&buffers, '1', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_2) {
-                    addToBuffer(&buffers, &cursor, '2', currentBufferType);
+                    addToBuffer(&buffers, '2', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_3) {
-                    addToBuffer(&buffers, &cursor, '3', currentBufferType);
+                    addToBuffer(&buffers, '3', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_4) {
-                    addToBuffer(&buffers, &cursor, '4', currentBufferType);
+                    addToBuffer(&buffers, '4', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_5) {
-                    addToBuffer(&buffers, &cursor, '5', currentBufferType);
+                    addToBuffer(&buffers, '5', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_6) {
-                    addToBuffer(&buffers, &cursor, '6', currentBufferType);
+                    addToBuffer(&buffers, '6', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_7) {
-                    addToBuffer(&buffers, &cursor, '7', currentBufferType);
+                    addToBuffer(&buffers, '7', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_8) {
-                    addToBuffer(&buffers, &cursor, '8', currentBufferType);
+                    addToBuffer(&buffers, '8', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_9) {
-                    addToBuffer(&buffers, &cursor, '9', currentBufferType);
+                    addToBuffer(&buffers, '9', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
-                if (event.key.key == SDLK_9) {
-                    addToBuffer(&buffers, &cursor, 'A', currentBufferType);
+                if (event.key.key == SDLK_A) {
+                    addToBuffer(&buffers, 'A', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
-                if (event.key.key == SDLK_9) {
-                    addToBuffer(&buffers, &cursor, 'B', currentBufferType);
+                if (event.key.key == SDLK_B) {
+                    addToBuffer(&buffers, 'B', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
-                if (event.key.key == SDLK_9) {
-                    addToBuffer(&buffers, &cursor, 'C', currentBufferType);
+                if (event.key.key == SDLK_C) {
+                    addToBuffer(&buffers, 'C', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
-                if (event.key.key == SDLK_9) {
-                    addToBuffer(&buffers, &cursor, 'D', currentBufferType);
+                if (event.key.key == SDLK_D) {
+                    addToBuffer(&buffers, 'D', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
-                if (event.key.key == SDLK_9) {
-                    addToBuffer(&buffers, &cursor, 'E', currentBufferType);
+                if (event.key.key == SDLK_E) {
+                    addToBuffer(&buffers, 'E', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
-                if (event.key.key == SDLK_9) {
-                    addToBuffer(&buffers, &cursor, 'F', currentBufferType);
+                if (event.key.key == SDLK_F) {
+                    addToBuffer(&buffers, 'F', currentBufferType);
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
                 if (event.key.key == SDLK_D) {
                     currentBufferType = Decimal;
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }
-                if (event.key.key == SDLK_B) {
+                if (event.key.key == SDLK_N) {
                     currentBufferType = Binary;
                     drawDigits(&ctx, textColor, &buffers, currentBufferType);
                 }

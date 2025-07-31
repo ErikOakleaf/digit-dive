@@ -9,6 +9,9 @@ typedef struct {
     char decimalBuffer[11];
     char binaryBuffer[37];
     char hexBuffer[9];
+    int decimalCursor;
+    int binaryCursor;
+    int hexCursor;
 } StringBuffers;
 
 typedef enum {
@@ -19,18 +22,18 @@ typedef enum {
 
 void initBuffers(StringBuffers *buffers);
 void reverseString(char *str);
-void decimalToBinary(char *decimalBuffer, char *binaryBuffer);
-void decimalToHex(char *decimalBuffer, char *hexBuffer);
-void binaryToDecimal(char *binaryBuffer, char *decimalBuffer);
-void hexToDecimal(char *hexBuffer, char *decimalBuffer);
-void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c, BufferType type);
-void addToBufferDecimal(StringBuffers *buffers, int *bufferIndex, char c);
-void addToBufferBinary(StringBuffers *buffers, int *bufferIndex, char c);
-void addToBufferHex(StringBuffers *buffers, int *bufferIndex, char c);
-void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type);
-void removeFromBufferDecimal(StringBuffers *buffers, int *bufferIndex);
-void removeFromBufferBinary(StringBuffers *buffers, int *bufferIndex);
-void removeFromBufferHex(StringBuffers *buffers, int *bufferIndex);
-void resetBuffers(StringBuffers *buffers, int *cursor);
+void decimalToBinary(StringBuffers *buffers);
+void decimalToHex(StringBuffers *buffers);
+void binaryToDecimal(StringBuffers *buffers);
+void hexToDecimal(StringBuffers *buffers);
+void addToBuffer(StringBuffers *buffers, char c, BufferType type);
+void addToBufferDecimal(StringBuffers *buffers, char c);
+void addToBufferBinary(StringBuffers *buffers, char c);
+void addToBufferHex(StringBuffers *buffers, char c);
+void removeFromBuffer(StringBuffers *buffers, BufferType type);
+void removeFromBufferDecimal(StringBuffers *buffers);
+void removeFromBufferBinary(StringBuffers *buffers);
+void removeFromBufferHex(StringBuffers *buffers);
+void resetBuffers(StringBuffers *buffers);
 
 #endif

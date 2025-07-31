@@ -5,6 +5,10 @@ void initBuffers(StringBuffers *buffers) {
     memset(buffers->decimalBuffer, 0, sizeof(buffers->decimalBuffer));
     memset(buffers->binaryBuffer, 0, sizeof(buffers->binaryBuffer));
     memset(buffers->hexBuffer, 0, sizeof(buffers->hexBuffer));
+
+    buffers->decimalCursor = 0;
+    buffers->binaryCursor = 0;
+    buffers->hexCursor = 0;
 }
 
 void reverseString(char *str) {
@@ -27,62 +31,81 @@ void reverseString(char *str) {
     }
 }
 
-void decimalToBinary(char *decimalBuffer, char *binaryBuffer) {
-    long long decimal = atoll(decimalBuffer);
+void decimalToBinary(StringBuffers *buffers) {
+    long long decimal = atoll(buffers->decimalBuffer);
 
     if (decimal == 0) {
-        binaryBuffer[0] = '0';
-        binaryBuffer[1] = '\0';
+        buffers->binaryBuffer[0] = '0';
+        buffers->binaryBuffer[1] = '\0';
         return;
     }
 
     int i = 0;
     while (decimal > 0) {
         int bit = decimal & 1;
-        binaryBuffer[i++] = '0' + bit;
+        buffers->binaryBuffer[i++] = '0' + bit;
 
         decimal = decimal >> 1;
     }
 
-    binaryBuffer[i] = '\0';
+    buffers->binaryBuffer[i] = '\0';
+    buffers->binaryCursor = i;
 
-    reverseString(binaryBuffer);
+    reverseString(buffers->binaryBuffer);
 }
 
-void decimalToHex(char *decimalBuffer, char *hexBuffer) {
-    long long num = atoll(decimalBuffer);
-    sprintf(hexBuffer, "%llX", num);
+void decimalToHex(StringBuffers *buffers) {
+    long long num = atoll(buffers->decimalBuffer);
+    sprintf(buffers->hexBuffer, "%llX", num);
+
+    buffers->hexCursor = strlen(buffers->hexBuffer);
 }
 
-void binaryToDecimal(char *binaryBuffer, char *decimalBuffer) {
-    char *endPointer;  
-    long long num = strtoll(binaryBuffer, &endPointer, 2);
+void binaryToDecimal(StringBuffers *buffers) {
+    char *endPointer;
+    long long num = strtoll(buffers->binaryBuffer, &endPointer, 2);
 
-    if(*endPointer != '\0') {
+    if (*endPointer != '\0') {
         return;
     }
 
-    sprintf(decimalBuffer, "%lld", num);
+    sprintf(buffers->decimalBuffer, "%lld", num);
+    buffers->decimalCursor = strlen(buffers->decimalBuffer);
 }
 
-void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c, BufferType type) {
+void hexToDecimal(StringBuffers *buffers) {
+    char *endPointer;
+    long long num = strtoll(buffers->hexBuffer, &endPointer, 16);
+
+    if (*endPointer != '\0') {
+        return;
+    }
+
+    sprintf(buffers->decimalBuffer, "%lld", num);
+    buffers->decimalCursor = strlen(buffers->decimalBuffer);
+}
+
+void addToBuffer(StringBuffers *buffers, char c, BufferType type) {
     switch (type) {
         case Decimal: {
             if (!(c >= '0' && c <= '9')) {
                 return;
             }
-            addToBufferDecimal(buffers, bufferIndex, c);
+            addToBufferDecimal(buffers, c);
             break;
         }
         case Binary: {
-            if (!(c == '0' | c == '1')) {
+            if (!(c == '0' || c == '1')) {
                 return;
             }
-            addToBufferBinary(buffers, bufferIndex, c);
+            addToBufferBinary(buffers, c);
             break;
         }
         case Hex: {
-
+            if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'))) {
+                return;
+            }
+            addToBufferHex(buffers, c);
             break;
         }
         default:
@@ -90,42 +113,53 @@ void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c, BufferType ty
     }
 }
 
-void addToBufferDecimal(StringBuffers *buffers, int *bufferIndex, char c) {
-    if (*bufferIndex < 10) {
-        buffers->decimalBuffer[(*bufferIndex)++] = c;
-        buffers->decimalBuffer[*bufferIndex] = '\0';
+void addToBufferDecimal(StringBuffers *buffers, char c) {
+    if (buffers->decimalCursor < 10) {
+        buffers->decimalBuffer[buffers->decimalCursor++] = c;
+        buffers->decimalBuffer[buffers->decimalCursor] = '\0';
     }
 
-    decimalToBinary(buffers->decimalBuffer, buffers->binaryBuffer);
-    decimalToHex(buffers->decimalBuffer, buffers->hexBuffer);
+    decimalToBinary(buffers);
+    decimalToHex(buffers);
 }
 
-void addToBufferBinary(StringBuffers *buffers, int *bufferIndex, char c) {
-    if (*bufferIndex < 33) {
-        buffers->binaryBuffer[(*bufferIndex)++] = c;
-        buffers->binaryBuffer[*bufferIndex] = '\0';
+void addToBufferBinary(StringBuffers *buffers, char c) {
+    if (buffers->binaryCursor < 33) {
+        buffers->binaryBuffer[buffers->binaryCursor++] = c;
+        buffers->binaryBuffer[buffers->binaryCursor] = '\0';
     }
 
-    binaryToDecimal(buffers->binaryBuffer, buffers->decimalBuffer);
-    decimalToHex(buffers->decimalBuffer, buffers->hexBuffer);
+    binaryToDecimal(buffers);
+    decimalToHex(buffers);
 }
 
-void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type) {
-    if (*bufferIndex <= 0) {
+void addToBufferHex(StringBuffers *buffers, char c) {
+    if (buffers->hexCursor < 8) {
+        buffers->hexBuffer[buffers->hexCursor++] = c;
+        buffers->hexBuffer[buffers->hexCursor] = '\0';
+    }
+
+    hexToDecimal(buffers);
+    decimalToBinary(buffers);
+}
+
+void removeFromBuffer(StringBuffers *buffers, BufferType type) {
+    if ((type == Decimal && buffers->decimalCursor <= 0) || (type == Binary && buffers->binaryCursor <= 0) ||
+        (type == Hex && buffers->hexCursor <= 0)) {
         return;
     }
 
     switch (type) {
         case Decimal: {
-            removeFromBufferDecimal(buffers, bufferIndex);
+            removeFromBufferDecimal(buffers);
             break;
         }
         case Binary: {
-            removeFromBufferBinary(buffers, bufferIndex);
+            removeFromBufferBinary(buffers);
             break;
         }
         case Hex: {
-
+            removeFromBufferHex(buffers);
             break;
         }
         default:
@@ -133,25 +167,37 @@ void removeFromBuffer(StringBuffers *buffers, int *bufferIndex, BufferType type)
     }
 }
 
-void removeFromBufferDecimal(StringBuffers *buffers, int *bufferIndex) {
-    (*bufferIndex)--;
-    buffers->decimalBuffer[*bufferIndex] = '\0';
+void removeFromBufferDecimal(StringBuffers *buffers) {
+    (buffers->decimalCursor)--;
+    buffers->decimalBuffer[buffers->decimalCursor] = '\0';
 
-    decimalToBinary(buffers->decimalBuffer, buffers->binaryBuffer);
-    decimalToHex(buffers->decimalBuffer, buffers->hexBuffer);
+    decimalToBinary(buffers);
+    decimalToHex(buffers);
 }
 
-void removeFromBufferBinary(StringBuffers *buffers, int *bufferIndex) {
-    (*bufferIndex)--;
-    buffers->binaryBuffer[*bufferIndex] = '\0';
+void removeFromBufferBinary(StringBuffers *buffers) {
+    (buffers->binaryCursor)--;
+    buffers->binaryBuffer[buffers->binaryCursor] = '\0';
 
-    binaryToDecimal(buffers->binaryBuffer, buffers->decimalBuffer);
-    decimalToHex(buffers->decimalBuffer, buffers->hexBuffer);
+    binaryToDecimal(buffers);
+    decimalToHex(buffers);
 }
 
-void resetBuffers(StringBuffers *buffers, int *cursor) {
+void removeFromBufferHex(StringBuffers *buffers) {
+    (buffers->hexCursor)--;
+    buffers->hexBuffer[buffers->hexCursor] = '\0';
+
+    hexToDecimal(buffers);
+    decimalToBinary(buffers);
+}
+
+void resetBuffers(StringBuffers *buffers) {
     buffers->decimalBuffer[0] = '\0';
     buffers->binaryBuffer[0] = '\0';
     buffers->hexBuffer[0] = '\0';
-    *cursor = 0;
+
+
+    buffers->decimalCursor = 0;
+    buffers->binaryCursor = 0;
+    buffers->hexCursor = 0;
 }
