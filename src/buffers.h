@@ -21,6 +21,8 @@ void initBuffers(StringBuffers *buffers);
 void reverseString(char *str);
 void decimalToBinary(char *decimalBuffer, char *binaryBuffer);
 void decimalToHex(char *decimalBuffer, char *hexBuffer);
+void binaryToDecimal(char *binaryBuffer, char *decimalBuffer);
+void hexToDecimal(char *hexBuffer, char *decimalBuffer);
 void addToBuffer(StringBuffers *buffers, int *bufferIndex, char c, BufferType type);
 void addToBufferDecimal(StringBuffers *buffers, int *bufferIndex, char c);
 void addToBufferBinary(StringBuffers *buffers, int *bufferIndex, char c);
