@@ -1,4 +1,24 @@
 #include "buffers.h"
+#include "stdbool.h"
+
+// prototypes
+
+void removeFromBufferDecimal(StringBuffers *buffers);
+void reverseString(char *str);
+void decimalToBinary(StringBuffers *buffers);
+void decimalToHex(StringBuffers *buffers);
+void binaryToDecimal(StringBuffers *buffers);
+void hexToDecimal(StringBuffers *buffers);
+void addToBufferDecimal(StringBuffers *buffers, char c);
+void addToBufferBinary(StringBuffers *buffers, char c);
+void addToBufferHex(StringBuffers *buffers, char c);
+void removeFromBufferDecimal(StringBuffers *buffers);
+void removeFromBufferBinary(StringBuffers *buffers);
+void removeFromBufferHex(StringBuffers *buffers);
+void resetBuffers(StringBuffers *buffers);
+bool checkIfEmpty(char *buffer);
+
+// implementations
 
 void initBuffers(StringBuffers *buffers) {
 
@@ -162,40 +182,51 @@ void removeFromBuffer(StringBuffers *buffers, BufferType type) {
             removeFromBufferHex(buffers);
             break;
         }
-        default:
-            return;
     }
 }
+
+bool inline checkIfEmpty(char *buffer) { return buffer[0] == '\0'; }
 
 void removeFromBufferDecimal(StringBuffers *buffers) {
     (buffers->decimalCursor)--;
     buffers->decimalBuffer[buffers->decimalCursor] = '\0';
 
-    decimalToBinary(buffers);
-    decimalToHex(buffers);
+    if (checkIfEmpty(buffers->decimalBuffer)) {
+        resetBuffers(buffers);
+    } else {
+        decimalToBinary(buffers);
+        decimalToHex(buffers);
+    }
 }
 
 void removeFromBufferBinary(StringBuffers *buffers) {
     (buffers->binaryCursor)--;
     buffers->binaryBuffer[buffers->binaryCursor] = '\0';
 
-    binaryToDecimal(buffers);
-    decimalToHex(buffers);
+    if (checkIfEmpty(buffers->binaryBuffer)) {
+        resetBuffers(buffers);
+    } else {
+        binaryToDecimal(buffers);
+        decimalToHex(buffers);
+    }
 }
 
 void removeFromBufferHex(StringBuffers *buffers) {
     (buffers->hexCursor)--;
     buffers->hexBuffer[buffers->hexCursor] = '\0';
 
-    hexToDecimal(buffers);
-    decimalToBinary(buffers);
+    if (checkIfEmpty(buffers->hexBuffer)) {
+        resetBuffers(buffers);
+    } else {
+        hexToDecimal(buffers);
+        decimalToBinary(buffers);
+    }
 }
 
 void resetBuffers(StringBuffers *buffers) {
     buffers->decimalBuffer[0] = '\0';
     buffers->binaryBuffer[0] = '\0';
     buffers->hexBuffer[0] = '\0';
-
 
     buffers->decimalCursor = 0;
     buffers->binaryCursor = 0;
